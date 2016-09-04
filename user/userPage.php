@@ -20,7 +20,7 @@
 </head>
 <body>
 <h2 class="text-capitalize">Welcome, <?php echo $username; ?></h2>
-
+<a type="button" class="btn btn-primary" href="editProfile.php"><span class="glyphicon glyphicon-user"></span> Edit Profile</a>
 
 <h4><a class="btn btn-danger" href="logout.php">Log Out</a></h4>
 
@@ -29,45 +29,59 @@
 	
 	$blogger = new blogger();
 	$bloggerId = $blogger->getId($username);
+	$blogger_is_active = $blogger->getActivity($bloggerId);
 
 	$blog = new blog();
 	$result = $blog->displayBlogs($bloggerId);
 
-	
-	$row = mysqli_fetch_array($result);
-	if ($row['blogger_is_active'] == 'N') {//------------put !=
+	$imageThings = new imageThings();
+	//row = mysqli_fetch_array($result);
+
+		
+
+	if ($blogger_is_active == 'N') {
 		echo "<h4>You are currently <strong>Inactivated</strong> by admin.</h4><br>";
 	} else {
+		echo "<div>";
 		echo "<form action=\"writeBlog.php\" method=\"post\"> ";
 		echo "<input type=\"hidden\" name=\"bloggerId\" value=\"" . $bloggerId . "\">";
-		echo "<input type=\"submit\" class=\"btn btn-primary\" value=\"";
+		echo "<button type=\"submit\" class=\"btn btn-primary\" >";
+		echo "<span class=\"glyphicon glyphicon-pencil\"> </span> ";
 		echo "Write a Blog";
-		echo "\">";
+		echo "</button";
 		echo "</form>";
+		echo "</div>";
 	}
 
-	if ($row['blog_is_active'] == 'N') {//------------put !=
+	
+
+	while($row = mysqli_fetch_array($result)){   //Creates a loop to loop through results
+
+	if ($row['blog_is_active'] == 'N') {
 		$ba = "Inactive ";
-	} else {
+	} else {	
 		$ba = "Active";
 	}
 
-	while($row = mysqli_fetch_array($result)){   //Creates a loop to loop through results
 	echo "<div class=\"jumbotron\">";
 	
 	echo "<label>" . "Blog Title : " . "</label>" . $row['blog_title'] . "<br>";
 	echo "<label>" . "Blog Category : " . "</label>" . $row['blog_category'] . "<br>";
 	echo "<label>" . "Blog Description : " . "</label>" . $row['blog_desc'] . "<br>";
 	echo "<label>" . "Blog ID : " . "</label>" . $row['blog_id'] . "<br>";
-	echo "<label>" . "Blog Activity : " . "</label>" . $ba . "<br>";
-	// echo "Blogger ID : " . $row['blogger_id'] . "<br>";
-	// echo "Blogger is active : " . $row['blogger_is_active'] . "<br>";
+	echo "<label>" . "Blog Status : " . "</label>" . $ba . "<br>";
+
+	$imageThings->displayimage($row['blog_id']);
 
 	echo "<form action=\"editPage.php\" method=\"post\"> ";
-	if ($row['blogger_is_active'] == 'N') {
+
+	if ($blogger_is_active == 'N') {
 		echo "<input class =\"btn btn-primary disabled\" type=\"submit\" value=\"Edit\" disabled>";// Just put a 'disabled' here.
 	} else {
-		echo "<input  class =\"btn btn-primary\" type=\"submit\" value=\"Edit\">";
+		echo "<button  class =\"btn btn-primary\" type=\"submit\" >";
+		echo "<span class=\"glyphicon glyphicon-pencil\"> </span> ";
+		echo "Edit";
+		echo "</button>";
 	}
 
 	

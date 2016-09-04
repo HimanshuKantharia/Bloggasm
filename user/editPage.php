@@ -1,10 +1,11 @@
 <?php
 	require '../classes/blogControl.php';
 
+	$imageThings = new imageThings();
 	$blog = new blog();
 	$blog_id_edit = $_POST['bid'];
 
-	echo "<br>blog id = " . $blog_id_edit ;
+	//echo "<br>blog id = " . $blog_id_edit ;
 
 	$result = $blog->displayBlog($blog_id_edit);
 
@@ -14,14 +15,23 @@
 	$blog_desc = $oldResult['blog_desc'];
 	$blog_category = $oldResult['blog_category'];
 
-	echo $blog_title;
-	echo $blog_category;
-	echo $blog_desc;
+	//echo $blog_title;
+	//echo $blog_category;
+	//echo $blog_desc;
 
-	if (!empty($_POST['title']) && !empty($_POST['category']) && !empty($_POST['desc'])) {
-		$result1 = $blog->editBlog($blog_id_edit,$blog_title,$blog_desc,$blog_category);
-		//$newResult = mysqli_fetch_array($result1);
-	}
+	// if (isset($_POST['submitbtn']) && !empty($_POST['title']) && !empty($_POST['category']) && !empty($_POST['desc'])) {
+	// 	$result1 = $blog->editBlog($blog_id_edit,$blog_title,$blog_desc,$blog_category);
+	// 			//echo "<br>HIMANSHu<br>";
+
+	// 	//$newResult = mysqli_fetch_array($result1);
+
+	// 	// $image= addslashes($_FILES['imagedata']['tmp_name']);
+	// 	// //$name= addslashes($_FILES['imagedata']['tmp_name']);
+	// 	// $image= file_get_contents($image);
+	// 	// $image= base64_encode($image);
+	// 	// echo "<br>HIMANSHu<br>";
+	// 	// $imageThings->editimage($blog_id_edit,$image);
+	// }
 
 	
 ?>
@@ -39,15 +49,15 @@
 </head>
 <body>
 <h2>EDIT a Blog here.</h2>
-<a type="button" href="userPage.php">I will EDIT later.</a>
+<a type="button" class="btn btn-danger" href="userPage.php">I will EDIT later.</a>
 
-<form method="post" action="updatePage.php" role="form">
+<form method="post" action="updatePage.php" role="form" enctype="multipart/form-data">
 <div class="form-group">
 	<div class="col-md-1">
 	<label for="title">Title :</label>
 	</div>
 	<div class="col-md-11">
-	<input type="text" name="title" class="form-control" value = "<?php echo $blog_title;?> ">
+	<input type="text" name="title" required="required" class="form-control" value = "<?php echo $blog_title;?> ">
 	</div>
 </div><br><br>
 <div class="form-group">
@@ -55,7 +65,7 @@
 	<label for="category">Category :</label>
 	</div>
 	<div class="col-md-11">
-	<input type="text" name="category" class="form-control" value = "<?php echo $blog_category;?> ">
+	<input type="text" name="category" required="required" class="form-control" value = "<?php echo $blog_category;?> ">
 	</div>
 </div><br><br>
 <div class="form-group">
@@ -63,10 +73,18 @@
 	<label for="desc">Describe here :</label>
 	</div>
 	<div class="col-md-11">
-	<textarea id="txtarea" name="desc" class="form-control" rows="5" ><?php echo $blog_title;?></textarea>
+	<textarea id="txtarea" name="desc" required="required" class="form-control" rows="5" ><?php echo $blog_title;?></textarea>
 	</div><br><br>
 
 	<input type="hidden" name = "bid" value=" <?php echo $blog_id_edit;?> ">
+
+	<div class="form-group">
+	<div class="col-md-1">
+	<label for="imagedata">Upload image :</label>
+	</div>
+	<div class="col-md-11">
+	<input type="file" name="imagedataedit" >
+</div><br><br><br><br><br><br>
 
 <div class="form-group">
 	<div class="col-md-4s">

@@ -1,3 +1,7 @@
+<!-- <?php
+	//session_start();
+	$_SESSION['username'] = "admin";
+?> -->
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -73,7 +77,15 @@ echo "<h3>List of<strong> Bloggers.</strong></h3><br/>";
 		echo "<td class=\"text-center\">" . $row['blogger_updated_date'] . "</td>";
 		echo "<td class=\"text-center\">";
 			echo "<form method = \"post\" action = \"changeActivity.php\">";
-				echo "<button type=\"submit\" name=\"toggle\" value = \" ";
+
+			if ($row['blogger_is_active'] == 'N') {
+			echo "<button type=\"submit\" class=\"btn btn-success\" name=\"toggle\" value = \" ";
+
+		}else{
+			$ny = "Deactivate";
+			echo "<button type=\"submit\" class=\"btn btn-danger\" name=\"toggle\" value = \" ";
+		}
+				
 				echo $row['blogger_username'];
 				echo "\" >";
 				echo $ny;

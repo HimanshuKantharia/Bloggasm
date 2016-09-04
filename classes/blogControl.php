@@ -19,10 +19,10 @@
 			$connect->executeQuery($createTable);
 		}
 
-		public function checkUser($userName,$password){
+		public function checkUser($userName){
 
 			$connect = new connect();
-			$query = "select blogger_username from blogger_info where blogger_username='".$userName."' and blogger_password='".$password."'";
+			$query = "select blogger_username from blogger_info where blogger_username='".$userName."' ";
 			$result = $connect->executeQuery($query);
 
 			return $result;
@@ -41,7 +41,7 @@
 			session_destroy();
 			session_start();
 			$_SESSION['username'] = $userName;
-			echo "Succesfully Logged in<br>";
+			//echo "Succesfully Logged in<br>";
 			
 		}
 
@@ -77,13 +77,14 @@
 
 		public function displayBloggers(){
 			$connect = new connect();
-			$query = "SELECT blogger_username,blogger_creation_date,blogger_is_active,blogger_updated_date,blogger_end_date FROM blogger_info GROUP BY blogger_id";
+			$query = "SELECT blogger_username,blogger_creation_date,blogger_is_active,blogger_updated_date,blogger_end_date FROM blogger_info";
 			$result = $connect->executeQuery($query);
 
 			//$bloggerData = mysqli_fetch_assoc($result);
 			return $result;
 		}
 
+		
 		public function getActivity($blogger_id){
 			$connect = new connect();
 			$query = "SELECT blogger_is_active FROM blogger_info where  blogger_id = '" . $blogger_id . "'";
@@ -104,6 +105,34 @@
 			$result = $connect->executeQuery($query);
 		}
 
+
+		public function createProfile($bloggerId,$bloggerName,$bloggerLastname,$gender,$contact,$about){
+			$connect = new connect();
+			$query = "INSERT into profile (blogger_id,blogger_name,blogger_lastname,gender,contact,about) values ('".$bloggerId."','".$bloggerName."','".$bloggerLastname."','".$gender."','".$contact."','".$about."') ";
+			$result = $connect->executeQuery($query);
+
+			return $result;
+		}
+
+
+		public function bloggerProfile($bloggerId){
+			$connect = new connect();
+		$query = "SELECT blogger_name,blogger_lastname,gender,contact,about FROM profile WHERE blogger_id = '" .$bloggerId."'";
+			$result = $connect->executeQuery($query);
+
+			return $result;
+		}
+
+		public function getMaxBloggerId(){
+			$connect = new connect();
+			$query = "SELECT MAX(blogger_id) FROM blogger_info";
+			$result = $connect->executeQuery($query);
+
+			$bloggerData = mysqli_fetch_assoc($result);
+			$bloggerMaxId = $bloggerData['MAX(blogger_id)'];
+
+			return $bloggerMaxId;
+		}
 	}//class BLOGGER ends here.
 
 
@@ -162,7 +191,7 @@
 
 		public function displayBlog($blog_id){
 			$connect = new connect();
-			$query = "SELECT blog_id,blog_title,blog_category,blog_desc,creation_date,updated_date,blogger_creation_date,blogger_id,blogger_is_active FROM blog_master NATURAL JOIN blogger_info WHERE blog_id = '".$blog_id."' ";
+			$query = "SELECT blog_id,blog_title,blog_category,blog_desc,creation_date,updated_date,blogger_creation_date,blogger_id,blogger_is_active FROM blog_master NATURAL JOIN blogger_info WHERE blog_id = '".$blog_id."' ORDER BY creation_date desc";
 			$result = $connect->executeQuery($query);
 			
 			return $result;
@@ -186,21 +215,78 @@
 			$result = $connect->executeQuery($query);
 		}
 
+		public function getMaxBlogId(){
+			$connect = new connect();
+			$query = "SELECT MAX(blog_id) FROM blog_master";
+			$result = $connect->executeQuery($query);
+
+			$blogData = mysqli_fetch_assoc($result);
+			$blogMaxId = $blogData['MAX(blog_id)'];
+
+			return $blogMaxId;
+		}
 
 	}//class BLOG ends here.
 
-		// function saveimage($name,$image) {
-		// 	$connect = new connect();
-                
-  //           $query = "insert into blog_details (blog_id,blog_detail_image) values ('$name','$image')";
-  //           $result = $connect->executeQuery($query);
-  //               if($result)
-  //               {
-  //                   echo "<br/>Image uploaded.";
-  //               }
-  //               else
-  //               {
-  //                   echo "<br/>Image not uploaded.";
-  //               }
-  //           }
+		
+	class imageThings{
+
+
+		function saveimage($name,$image)
+		{                   
+            
+			$connect = new connect();
+			$connect->startConnection();
+
+			$query = "INSERT into blog_detail (blog_id,blog_detail_image) values ('" . $name . " ','" . $image . "')";
+			$result = $connect->executeQuery($query);
+
+			if($result)
+			{
+				echo "<br/>Image uploaded.";
+			}
+			else
+			{
+				echo "<br/>Image not uploaded.";
+			}
+			//$connect->stopConnection();
+		}
+
+
+		function displayimage($blogId)
+		{
+			$connect = new connect();
+			$connect->startConnection();
+			$query = "SELECT blog_detail_image from blog_detail WHERE blog_id = '".$blogId."' ";
+			$result = $connect->executeQuery($query);
+
+			while($row = mysqli_fetch_array($result))
+			{
+				echo '<img height="300" width="300" src="data:image;base64,'.$row['blog_detail_image'].' "> ';
+			}
+			//$connect->stopConnection();   
+		}
+
+		function editimage($blogId,$value)
+		{
+			$connect = new connect();
+			$connect->startConnection();
+
+			$query1 = "SELECT blog_id FROM blog_detail WHERE blog_id = '" . $blogId . "' ";
+			$result1 = $connect->executeQuery($query1);
+
+			if (mysqli_num_rows($result1)){
+				$query = "UPDATE blog_detail set blog_detail_image = '". $value ."' WHERE blog_id = '".$blogId."' ";
+				$result = $connect->executeQuery($query);
+			} else {
+				$query = "INSERT into blog_detail (blog_id,blog_detail_image) values ('" . $blogId . " ','" . $value . "')";
+				$result = $connect->executeQuery($query);			
+			}
+			
+
+			
+			//$connect->stopConnection();   
+		}
+
+    }//-------class imageThings end here
 ?>

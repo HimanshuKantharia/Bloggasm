@@ -11,10 +11,11 @@
 
 </head>
 <body>
+<br /><br />
 	<?php
 	session_start();
 	//echo $_SESSION['check'];
-	if ($_SESSION['username'] == "admin") {
+	if (isset($_SESSION['username'])) {
 		echo "<br />";
 		echo "<form action=\"admin/admin.php\">";
 		echo "<button class=\"btn btn-primary left\" type = \"submit\">Admin Page</button>";
@@ -30,30 +31,45 @@
 </body>
 </html>
 <?php
-
+	//include 'admin/admin.php';
 	require 'classes/blogControl.php';
 
  	$blogger_id = $_POST['bid'];
 
 	$blog = new blog();
-	$result = $blog->displayBlogs($blogger_id);
-	
-
 	$blogger = new blogger();
+	$imageThings = new imageThings();
+
+	$result = $blog->displayBlogs($blogger_id);
+		
+
+	$profile = $blogger->bloggerProfile($blogger_id);
+	$prorow = mysqli_fetch_array($profile);
+
 	$authorName = $blogger->getUsername($blogger_id);
 
-	echo "<blockquote>";
-	echo "<p>";
-	echo "<br>Author Name : " . $authorName .  "<br>";
-	echo "Author Id: " . $blogger_id .  "<br>";
-	//echo "Joint on: " . $blogger_create_date . "<br>";
-	echo "</p>";
-	echo "</blockquote>";
+	echo "<div class=\"container\">";
+		echo "<blockquote>";
+		echo "<p class=\"text-capitalize\">";
+			echo "<br>Name : " . $prorow['blogger_name'] .  "<br>";
+			echo "Lastname: " . $prorow['blogger_lastname'] .  "<br>";
+			echo "Contact: " . $prorow['contact'] .  "<br>";
+			echo "about: " . $prorow['about'] .  "<br>";
+			echo "Username: " . $authorName .  "<br>";
+			echo "Id: " . $blogger_id .  "<br>";
+			
+		echo "</p>";
+		echo "</blockquote>";
+	echo "</div>";
 
+echo "<div class=\"container\">";
 	while($row = mysqli_fetch_array($result)){   //Creates a loop to loop through results
 	
-	if ($_SESSION['username'] != 'admin') {
 
+	//if ($_SESSION['username'] != 'admin') {
+	if (!isset($_SESSION['username'])) {
+		
+	
 	if ($row['blog_is_active'] == 'Y'){
 	echo "<div class=\"jumbotron\">";
 
@@ -61,19 +77,22 @@
 	echo "<label>" . "Blog Category : " . "</label>" .  $row['blog_category'] . "<br>";
 	echo "<label>" . "Blog Description : " . "</label>" .  $row['blog_desc'] . "<br>";
 	echo "<label>" . "Blog Creation date : " . "</label>" .  $row['creation_date'] . "<br>";
-
-
+	$imageThings->displayimage($row['blog_id']);
+	
+	
 	}
 }
 
-	if ($_SESSION['username'] == 'admin') {
+	if (isset($_SESSION['username']) ) {
 
 	echo "<div class=\"jumbotron\">";
 
 	echo "<label>" . "<br>Blog Title : " . "</label>" .  $row['blog_title'] . "<br>";
 	echo "<label>" . "Blog Category : " . "</label>" .  $row['blog_category'] . "<br>";
 	echo "<label>" . "Blog Description : " . "</label>" .  $row['blog_desc'] . "<br>";
-	echo "<label>" . "Blog Creation date : " . "</label>" .  $row['creation_date'] . "<br>";
+	$imageThings->displayimage($row['blog_id']);
+	echo "<br><label>" . "Blog Creation date : " . "</label>" .  $row['creation_date'] . "<br>";
+	//$imageThings->displayimage($blogger_id);
 
 	if ($row['blog_is_active'] == 'N') {
 			$ny = "InActive";

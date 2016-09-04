@@ -1,24 +1,14 @@
 <?php
 	require '../classes/blogControl.php';	
-		
+	//require '../classes/dbcontrol.php';
+
 	$bloggerId = $_POST['bloggerId'];
 
-	if (!empty($_POST['title']) && !empty($_POST['category']) && !empty($_POST['desc'])) {
-						
-				
-		echo "Bloger id " .$bloggerId;
-
-		$blogger = new blogger();
-		$bloggerName = $blogger->getUsername($bloggerId);
-				
-		$blog = new blog();
-		$blog->storeBlog($bloggerId,$_POST['title'],$_POST['desc'],$_POST['category'],$bloggerName);
-		
-		}
-
+	//if (!empty($_POST['title']) && !empty($_POST['category']) && !empty($_POST['desc'])) {
 ?>
 
-<!DOCTYPE HTML>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,13 +27,13 @@
 	<input type="submit" class="btn btn-primary" value="Write Later">
 </form>
 
-<form method="post" action="writeBlog.php" name="blogForm" role="form">
+<form method="post" action="writeBlog.php" enctype='multipart/form-data'>
 <div class="form-group">
 	<div class="col-md-1">
 	<label for="title">Title :</label>
 	</div>
 	<div class="col-md-11">
-	<input type="text" name="title" class="form-control">
+	<input type="text" name="title" required="required" class="form-control">
 	</div>
 </div><br><br>
 <div class="form-group">
@@ -51,7 +41,7 @@
 	<label for="category">Category :</label>
 	</div>
 	<div class="col-md-11">
-	<input type="text" name="category" class="form-control">
+	<input type="text" name="category" required="required" class="form-control">
 	</div>
 </div><br><br>
 <div class="form-group">
@@ -59,23 +49,23 @@
 	<label for="desc">Describe here :</label>
 	</div>
 	<div class="col-md-11">
-	<textarea id="txtarea" name="desc" class="form-control" rows="5"></textarea>
+	<textarea id="txtarea" name="desc" required="required" class="form-control" rows="5"></textarea>
 </div><br><br><br><br><br><br>
 
-<!-- <div class="form-group">
+<div class="form-group">
 	<div class="col-md-1">
-	<label for="name">Upload image :</label>
+	<label for="imagedata">Upload image :</label>
 	</div>
 	<div class="col-md-11">
-	<input type="file" accept="image/*" name="image">
+	<input type="file" name="imagedata">
 </div><br><br><br><br><br><br>
 
- -->
+ 
  <input type="hidden" name="bloggerId" value="<?php echo $bloggerId; ?>">
 
 <div class="form-group">
 	<div class="col-md-4">
-	<input type="submit" name="submit">
+	<input type="submit" value = "Submit" name="submitbtn" class="btn btn-primary">
 	</div>
 
 
@@ -85,3 +75,40 @@
 </body>
 </html>
 
+<?php						
+	if(isset($_POST['submitbtn']) && !empty($_POST['title']) && !empty($_POST['category']) && !empty($_POST['desc'])){			
+		echo "Bloger id " .$bloggerId;
+
+		$blogger = new blogger();
+		$bloggerName = $blogger->getUsername($bloggerId);
+				
+		$blog = new blog();
+		$blog->storeBlog($bloggerId,$_POST['title'],$_POST['desc'],$_POST['category'],$bloggerName);
+		
+		$blogMaxId = $blog->getMaxBlogid();
+		echo $blogMaxId;
+
+		$imageThings = new imageThings();
+
+		//$target_dir = "C:\Program Files (x86)\SOFTWARES\Wamp\wamp\www\Blogging\FinalFS/";
+		//$target_file = $target_dir . basename($_FILES['imagedata']['tmp_name']);
+		//$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+		
+		if(getimagesize($_FILES['imagedata']['tmp_name']) == FALSE)
+		{
+			echo "Please select an image.";
+		}
+		else
+		{
+			 $image= addslashes($_FILES['imagedata']['tmp_name']);
+			 //$name= addslashes($_FILES['imagedata']['tmp_name']);
+			 $name = $blogMaxId;
+			 $image= file_get_contents($image);
+			 $image= base64_encode($image);
+			 $imageThings->saveimage($name,$image);
+			echo "Gottcha!..";
+			$imageThings->displayimage($blogMaxId);
+		}
+	}
+
+?>
